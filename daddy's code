@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load historical data for DAL (assuming the data is stored in a CSV file)
-dal_data = pd.read_csv('dal_data.csv', index_col='Date', parse_dates=True)
+dal_data = pd.read_csv('DAL_data_1.csv', index_col='Date', parse_dates=True)
 
 # Calculate MACD (12-day and 26-day moving averages)
 dal_data['12-day EMA'] = dal_data['Close'].ewm(span=12).mean()
@@ -54,6 +54,7 @@ for index, row in dal_data.iterrows():
             position = 0
             betAmount = balance * 0.1
             # Reset shares bought, reset position, and make the new bet 10 percent of new balance
+    balance = balance * 1.0001443835616
 
 
 # Sell all remaining shares at the fixed final sell price
