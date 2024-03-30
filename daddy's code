@@ -18,11 +18,10 @@ dal_data['200-day SMA'] = dal_data['Adj Close'].rolling(window=200).mean()
 initial_balance = 10000  # Initial investment amount
 balance = initial_balance
 position = 0  # 0 for no position, 1 for long position
-stop_loss = 0.025  # Stop loss percentage
 shares_bought = 0  # Initialize shares bought
-total_shares_bought = 0
+total_shares_bought = 0 # Aggregate shares
 final_sell_price = 47.87  # Fixed final sell price FOR NOW, CHANGE AT END
-betAmount = 1
+betAmount = 40 # Buy approximately one share at a time
 shift = 10
 
 print("Initial Balance: $:", initial_balance)
@@ -35,18 +34,16 @@ for index, row in dal_data.iterrows():
   # Buy signal conditions (more aggressive)
   if row['MACD'] > row['Signal Line'] and row['MACD'] < 0 and row[
       'Adj Close'] > row['200-day SMA'] - shift:
-    if balance - (total_shares_bought *
-                  row['Adj Close']) >= 0:  # Check if buying is affordable
+    if balance >= 0:  # Check if buying is affordable (Can be negative which signifies use of leverage)
       position = 1
       buy_price = row['Adj Close']
-      shares_bought += int(betAmount /
-                           buy_price)  # Calculate affordable shares
+      shares_bought += int(betAmount / buy_price)  # Calculate affordable shares
       total_shares_bought += shares_bought
       balance -= shares_bought * buy_price  # Deduct cost of shares from balance
       print(f"Buy DAL at {buy_price}, Shares: {shares_bought}, Date: {index}")
       print(f"Current Balance: ${balance:.2f}")
       shares_bought = 0
-      betAmount = betAmount * 1.55555
+      betAmount = betAmount * 1.55555 # Increase bet amount by ~5% every time a buy is made
 
   # Sell signal conditions (more aggressive)
   if position == 1 and row['Signal Line'] > row['MACD']:
@@ -58,7 +55,7 @@ for index, row in dal_data.iterrows():
       balance += total_shares_bought * sell_price  # Add sale proceeds to balance
       total_shares_bought = 0
       position = 0
-      betAmount = balance * 0.1
+      betAmount = balance * 0.2
       # Reset shares bought, reset position, and make the new bet 10 percent of new balance
   balance = balance * 1.0001443835616
 
