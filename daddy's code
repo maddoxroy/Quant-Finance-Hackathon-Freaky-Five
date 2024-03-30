@@ -1,4 +1,4 @@
-iimport pandas as pd
+import pandas as pd
 
 # Load historical data for DAL (assuming the data is stored in a CSV file)
 dal_data = pd.read_csv('dal_data.csv', index_col='Date', parse_dates=True)
