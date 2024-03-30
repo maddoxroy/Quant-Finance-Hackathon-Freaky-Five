@@ -23,6 +23,7 @@ shares_bought = 0  # Initialize shares bought
 total_shares_bought = 0
 final_sell_price = 47.87  # Fixed final sell price FOR NOW, CHANGE AT END
 betAmount = 1000
+shift = 10
 
 print("Initial Balance: $:",initial_balance)
 
@@ -31,7 +32,7 @@ for index, row in dal_data.iterrows():
         continue  # Skip NaN values
 
     # Buy signal conditions (more aggressive)
-    if row['MACD'] > row['Signal Line'] and row['MACD'] < 0 and row['Adj Close'] > row['200-day SMA'] - 10:
+    if row['MACD'] > row['Signal Line'] and row['MACD'] < 0 and row['Adj Close'] > row['200-day SMA'] - shift:
         if balance - (total_shares_bought * row['Adj Close']) >= 0:  # Check if buying is affordable
             position = 1
             buy_price = row['Adj Close']
@@ -41,16 +42,19 @@ for index, row in dal_data.iterrows():
             print(f"Buy DAL at {buy_price}, Shares: {shares_bought}, Date: {index}")
             print(f"Current Balance: ${balance:.2f}")
             shares_bought = 0
+            betAmount = betAmount * 1.55
 
     # Sell signal conditions (more aggressive)
-    if position == 1 and row['Signal Line'] > row['MACD'] and row['Adj Close']:
-      sell_price = row['Adj Close'] # debugging, fixed sell price
-      if sell_price > buy_price:  # Ensure selling at a profit
+    if position == 1 and row['Signal Line'] > row['MACD']:
+        sell_price =  row['Adj Close']# debugging, fixed sell price
+        if sell_price > buy_price:  # Ensure selling at a profit
             print(f"Sell DAL at {sell_price}, Shares: {total_shares_bought} Balance: {balance}, Date: {index}")
             balance += total_shares_bought * sell_price  # Add sale proceeds to balance
-            total_shares_bought = 0  # Reset shares bought
+            total_shares_bought = 0
             position = 0
             betAmount = balance * 0.1
+            # Reset shares bought, reset position, and make the new bet 10 percent of new balance
+
 
 # Sell all remaining shares at the fixed final sell price
 if position == 1:
