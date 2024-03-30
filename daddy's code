@@ -31,7 +31,7 @@ for index, row in dal_data.iterrows():
         continue  # Skip NaN values
 
     # Buy signal conditions (more aggressive)
-    if row['MACD'] > row['Signal Line'] and row['MACD'] < 0 and row['Adj Close'] > row['200-day SMA'] - 5:
+    if row['MACD'] > row['Signal Line'] and row['MACD'] < 0 and row['Adj Close'] > row['200-day SMA'] - 10:
         if balance - (total_shares_bought * row['Adj Close']) >= 0:  # Check if buying is affordable
             position = 1
             buy_price = row['Adj Close']
@@ -43,13 +43,14 @@ for index, row in dal_data.iterrows():
             shares_bought = 0
 
     # Sell signal conditions (more aggressive)
-    if position == 1 and row['Signal Line'] > row['MACD'] and row['Adj Close'] < row['200-day SMA'] + 5:
+    if position == 1 and row['Signal Line'] > row['MACD'] and row['Adj Close']:
       sell_price = row['Adj Close'] # debugging, fixed sell price
       if sell_price > buy_price:  # Ensure selling at a profit
             print(f"Sell DAL at {sell_price}, Shares: {total_shares_bought} Balance: {balance}, Date: {index}")
             balance += total_shares_bought * sell_price  # Add sale proceeds to balance
             total_shares_bought = 0  # Reset shares bought
             position = 0
+            betAmount = balance * 0.1
 
 # Sell all remaining shares at the fixed final sell price
 if position == 1:
