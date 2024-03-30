@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load historical data for DAL (assuming the data is stored in a CSV file)
-dal_data = pd.read_csv('DAL_data_1.csv', index_col='Date', parse_dates=True)
+dal_data = pd.read_csv('dal_data.csv', index_col='Date', parse_dates=True)
 
 # Calculate MACD (12-day and 26-day moving averages)
 dal_data['12-day EMA'] = dal_data['Close'].ewm(span=12).mean()
@@ -42,14 +42,14 @@ for index, row in dal_data.iterrows():
             print(f"Buy DAL at {buy_price}, Shares: {shares_bought}, Date: {index}")
             print(f"Current Balance: ${balance:.2f}")
             shares_bought = 0
-            betAmount = betAmount * 1.55
+            betAmount = betAmount * 1.55555
 
     # Sell signal conditions (more aggressive)
     if position == 1 and row['Signal Line'] > row['MACD']:
         sell_price =  row['Adj Close']# debugging, fixed sell price
         if sell_price > buy_price:  # Ensure selling at a profit
-            print(f"Sell DAL at {sell_price}, Shares: {total_shares_bought} Balance: {balance}, Date: {index}")
             balance += total_shares_bought * sell_price  # Add sale proceeds to balance
+            print(f"Sell DAL at {sell_price}, Shares: {total_shares_bought} Balance: {balance: .2f}, Date: {index}")
             total_shares_bought = 0
             position = 0
             betAmount = balance * 0.1
